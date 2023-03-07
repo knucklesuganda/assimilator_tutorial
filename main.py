@@ -1,23 +1,20 @@
 from assimilator.core.database import Repository, UnitOfWork
 
 from dependencies import create_repository, create_uow
-from models import User
 
 
 def create_user(uow: UnitOfWork):
     with uow:
-        new_user = User(
+        uow.repository.save(
             username="Andrey",
             email="python.on.papyrus@gmail.com",
         )
 
-        new_user2 = User(
+        uow.repository.save(
             username="Andrey-2",
             email="python.on.papyrus-2@gmail.com",
         )
 
-        uow.repository.save(new_user)
-        uow.repository.save(new_user2)
         uow.commit()
 
 
