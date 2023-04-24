@@ -1,65 +1,21 @@
-from assimilator.core.database import Repository, UnitOfWork
+from assimilator.core.database import Repository, filter_
 
-from dependencies import create_repository, create_uow
-
-
-def create_user(uow: UnitOfWork):
-    with uow:
-        uow.repository.save(
-            username="Andrey",
-            email="python.on.papyrus@gmail.com",
-        )
-
-        uow.repository.save(
-            username="Andrey-2",
-            email="python.on.papyrus-2@gmail.com",
-        )
-
-        uow.commit()
+from dependencies import get_repository
 
 
-def read_user(repository: Repository):
-    user = repository.get(
-        repository.specs.filter(
-            username="Andrey",
-        )
+def create_user(repository: Repository):
+    user = repository.save(
+        username="Andrey",
+        balance=1000000,
     )
+    return user.id
 
+
+def read_user(id: str, repository: Repository):
+    user = repository.get(filter_(id=id))
     print(user)
 
 
-def update_user(uow: UnitOfWork):
-    with uow:
-        user = uow.repository.get(
-            uow.repository.specs.filter(
-                username="Andrey",
-            )
-        )
-
-        user.balance += 10
-        uow.repository.update(user)
-        uow.commit()
-
-        uow.repository.refresh(user)
-
-
-def delete_user(uow: UnitOfWork):
-    with uow:
-        user = uow.repository.get(
-            uow.repository.specs.filter(
-                username="Andrey-2",
-            )
-        )
-
-        uow.repository.delete(user)
-        uow.commit()
-
-
 if __name__ == '__main__':
-    create_user(uow=create_uow())
-
-    read_user(repository=create_repository())
-    update_user(create_uow())
-    read_user(repository=create_repository())
-
-    delete_user(create_uow())
+    user_id = create_user(repository=get_repository())
+    read_user(id=user_id, repository=get_repository())
